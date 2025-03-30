@@ -95,6 +95,14 @@
         <Content Include="images\bc5u_reconstructed.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <None Remove="images\bc7.dds"/>
+        <Content Include="images\bc7.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="images\bc7.png"/>
+        <Content Include="images\bc7.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>

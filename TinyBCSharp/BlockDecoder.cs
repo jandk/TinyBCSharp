@@ -47,7 +47,7 @@ public abstract class BlockDecoder
             case BlockFormat.BC6HSf32:
                 break;
             case BlockFormat.BC7:
-                break;
+                return new BC7Decoder();
             default:
                 throw new ArgumentOutOfRangeException(nameof(format), format, null);
         }
