@@ -20,17 +20,17 @@ namespace TinyBCSharp
 
         public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
         {
-        // @formatter:off
-        uint c0 = BinaryPrimitives.ReadUInt16LittleEndian(src);
-        uint c1 = BinaryPrimitives.ReadUInt16LittleEndian(src[2..]);
+            // @formatter:off
+            uint c0 = BinaryPrimitives.ReadUInt16LittleEndian(src);
+            uint c1 = BinaryPrimitives.ReadUInt16LittleEndian(src[2..]);
 
-        var r0 = (c0 >> 11) & 0x1F;
-        var g0 = (c0 >>  5) & 0x3F;
-        var b0 =  c0        & 0x1F;
+            var r0 = (c0 >> 11) & 0x1F;
+            var g0 = (c0 >>  5) & 0x3F;
+            var b0 =  c0        & 0x1F;
 
-        var r1 = (c1 >> 11) & 0x1F;
-        var g1 = (c1 >>  5) & 0x3F;
-        var b1 =  c1        & 0x1F;
+            var r1 = (c1 >> 11) & 0x1F;
+            var g1 = (c1 >>  5) & 0x3F;
+            var b1 =  c1        & 0x1F;
             // @formatter:on
 
             var colors = (stackalloc uint[4]);
