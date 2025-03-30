@@ -113,7 +113,14 @@
         <Content Include="images\bc6h_uf16_16.dds">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <None Remove="..\..\..\.nuget\packages\nunit3testadapter\4.6.0\build\net462\NUnit3.TestAdapter.pdb"/>
+        <None Remove="images\bc4u-part.dds"/>
+        <Content Include="images\bc4u-part.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="images\bc4u-part.png"/>
+        <Content Include="images\bc4u-part.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 

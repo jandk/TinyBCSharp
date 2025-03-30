@@ -64,7 +64,7 @@ namespace TinyBCSharp
             var rowStride = width * _pixelStride;
             if (dst.Length < height * rowStride)
             {
-                throw new ArgumentException("dst.Length must be greater than height * bytesPerLine", nameof(dst));
+                throw new ArgumentException("dst.Length must be greater than height * rowStride", nameof(dst));
             }
 
             // Objects.checkFromIndexSize(srcPos, format.size(width, height), src.length);
@@ -78,20 +78,18 @@ namespace TinyBCSharp
                 for (var x = 0; x < width; x += BlockWidth)
                 {
                     var dstOffset = dstPos + x * _pixelStride;
-                    if (height - y < 4 || width - x < 4)
-                    {
+                    if (height >= y + 4 && width >= x + 4)
+                        DecodeBlock(src[srcPos..], dst[dstOffset..], rowStride);
+                    else
                         PartialBlock(width, height, src[srcPos..], dst[dstOffset..], x, y, rowStride);
-                        continue;
-                    }
 
-                    DecodeBlock(src[srcPos..], dst[dstOffset..], rowStride);
                     srcPos += blockStride;
                 }
             }
         }
 
         private void PartialBlock(int width, int height, ReadOnlySpan<byte> src, Span<byte> dst, int x, int y,
-            int bytesPerLine)
+            int rowStride)
         {
             var blockStride = _pixelStride * BlockWidth;
             var block = (stackalloc byte[BlockHeight * blockStride]);
@@ -103,7 +101,7 @@ namespace TinyBCSharp
             {
                 block
                     .Slice(yy * blockStride, partialStride)
-                    .CopyTo(dst[(yy * bytesPerLine)..]);
+                    .CopyTo(dst[(yy * rowStride)..]);
             }
         }
 
