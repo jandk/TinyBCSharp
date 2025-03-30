@@ -1,8 +1,9 @@
-﻿namespace TinyBCDec;
-
-public enum BC1Mode
+﻿namespace TinyBCDec
 {
-    Normal,
-    BC2Or3,
-    Opaque,
+    public enum BC1Mode
+    {
+        Normal,
+        BC2Or3,
+        Opaque,
+    }
 }

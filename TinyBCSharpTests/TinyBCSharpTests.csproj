@@ -1,26 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <RootNamespace>TinyBCDecTests</RootNamespace>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1"/>
-        <PackageReference Include="NUnit" Version="4.2.2"/>
-        <PackageReference Include="NUnit.Analyzers" Version="4.3.0"/>
-        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
-        <PackageReference Include="System.Drawing.Common" Version="9.0.3"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Using Include="NUnit.Framework"/>
-    </ItemGroup>
 
     <ItemGroup>
         <None Remove="images\bc1.dds"/>
@@ -111,13 +97,6 @@
         <Content Include="images\bc6h_uf16_32.dds">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\TinyBCSharp\TinyBCSharp.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <None Remove="images\bc6h_sf16.dds"/>
         <Content Include="images\bc6h_sf16.dds">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -134,6 +113,19 @@
         <Content Include="images\bc6h_uf16_16.dds">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <None Remove="..\..\..\.nuget\packages\nunit3testadapter\4.6.0\build\net462\NUnit3.TestAdapter.pdb"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\TinyBCSharp\TinyBCSharp.csproj"/>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
+        <PackageReference Include="NUnit" Version="4.3.2"/>
+        <PackageReference Include="System.Drawing.Common" Version="9.0.3"/>
     </ItemGroup>
 
 </Project>

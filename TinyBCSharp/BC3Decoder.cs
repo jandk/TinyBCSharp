@@ -1,15 +1,23 @@
-﻿namespace TinyBCDec;
+﻿using System;
 
-internal class BC3Decoder() : BlockDecoder(BlockFormat.BC3, 4)
+namespace TinyBCDec
 {
-    private const int BPP = 4;
-
-    private readonly BC1Decoder _colorDecoder = new(BC1Mode.BC2Or3);
-    private readonly BC4UDecoder _alphaDecoder = new(BPP);
-
-    public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
+    internal class BC3Decoder : BlockDecoder
     {
-        _colorDecoder.DecodeBlock(src[8..], dst, stride);
-        _alphaDecoder.DecodeBlock(src, dst[3..], stride);
+        private const int BytesPerPixel = 4;
+
+        private readonly BC1Decoder _colorDecoder = new BC1Decoder(BC1Mode.BC2Or3);
+        private readonly BC4UDecoder _alphaDecoder = new BC4UDecoder(BytesPerPixel);
+
+        public BC3Decoder()
+            : base(BlockFormat.BC3, 4)
+        {
+        }
+
+        public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
+        {
+            _colorDecoder.DecodeBlock(src[8..], dst, stride);
+            _alphaDecoder.DecodeBlock(src, dst[3..], stride);
+        }
     }
 }

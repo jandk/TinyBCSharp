@@ -1,16 +1,19 @@
-﻿using TinyBCDec;
+﻿using System.IO;
+using NUnit.Framework;
+using TinyBCDec;
 
-namespace TinyBCDecTests;
-
-public class BC4SDecoderTest
+namespace TinyBCSharpTests
 {
-    [Test]
-    public void TestBC4S()
+    public class BC4SDecoderTest
     {
-        var decoder = BlockDecoder.Create(BlockFormat.BC4S);
-        var src = File.ReadAllBytes("images/bc4s.dds")[BCTestUtils.DdsHeaderSize..];
-        var actual = decoder.Decode(256, 256, src);
-        var expected = BCTestUtils.ReadPng("images/bc4s.png", 1);
-        Assert.That(actual, Is.EqualTo(expected));
+        [Test]
+        public void TestBC4S()
+        {
+            var decoder = BlockDecoder.Create(BlockFormat.BC4S);
+            var src = File.ReadAllBytes("images/bc4s.dds")[BCTestUtils.DdsHeaderSize..];
+            var actual = decoder.Decode(256, 256, src);
+            var expected = BCTestUtils.ReadPng("images/bc4s.png", 1);
+            Assert.That(actual, Is.EqualTo(expected));
+        }
     }
 }

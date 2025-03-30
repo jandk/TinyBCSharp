@@ -1,34 +1,37 @@
-﻿namespace TinyBCDec;
+﻿using System;
 
-internal class ReconstructZ
+namespace TinyBCDec
 {
-    private static readonly byte[] Normal = new byte[256 * 256];
-
-    static ReconstructZ()
+    internal class ReconstructZ
     {
-        for (var y = 0; y < 256; y++)
+        private static readonly byte[] Normal = new byte[256 * 256];
+
+        static ReconstructZ()
         {
-            for (var x = 0; x < 256; x++)
+            for (var y = 0; y < 256; y++)
             {
-                var r = x * (1.0f / 127.5f) - 1.0f;
-                var g = y * (1.0f / 127.5f) - 1.0f;
-                var b = (float)Math.Sqrt(1.0f - Math.Min(1.0f, Math.Max(r * r + g * g, 0.0f)));
-                Normal[(y << 8) + x] = (byte)(b * 127.5f + 128.0f);
+                for (var x = 0; x < 256; x++)
+                {
+                    var r = x * (1.0f / 127.5f) - 1.0f;
+                    var g = y * (1.0f / 127.5f) - 1.0f;
+                    var b = (float)Math.Sqrt(1.0f - Math.Min(1.0f, Math.Max(r * r + g * g, 0.0f)));
+                    Normal[(y << 8) + x] = (byte)(b * 127.5f + 128.0f);
+                }
             }
         }
-    }
 
-    internal static void Reconstruct(Span<byte> dst, int lineStride, int pixelStride)
-    {
-        for (int y = 0; y < 4; y++)
+        internal static void Reconstruct(Span<byte> dst, int lineStride, int pixelStride)
         {
-            int dstPos = y * lineStride;
-            for (int x = 0; x < 4; x++)
+            for (var y = 0; y < 4; y++)
             {
-                int i = dstPos + x * pixelStride;
-                int r = dst[i /**/];
-                int g = dst[i + 1];
-                dst[i + 2] = Normal[(g << 8) + r];
+                var dstPos = y * lineStride;
+                for (var x = 0; x < 4; x++)
+                {
+                    var i = dstPos + x * pixelStride;
+                    int r = dst[i + 0];
+                    int g = dst[i + 1];
+                    dst[i + 2] = Normal[(g << 8) + r];
+                }
             }
         }
     }
