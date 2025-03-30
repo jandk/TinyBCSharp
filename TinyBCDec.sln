@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyBCDec", "TinyBCDec\TinyBCDec.csproj", "{A5B33C6D-8099-4552-B13C-9749DABBAA25}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyBCSharp", "TinyBCSharp\TinyBCSharp.csproj", "{A5B33C6D-8099-4552-B13C-9749DABBAA25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyBCDecTests", "TinyBCDecTests\TinyBCDecTests.csproj", "{BD94E96F-E20B-4DEB-B018-7C2F606502A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyBCSharpTests", "TinyBCSharpTests\TinyBCSharpTests.csproj", "{BD94E96F-E20B-4DEB-B018-7C2F606502A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

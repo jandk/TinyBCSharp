@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
+        <RootNamespace>TinyBCDecTests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -97,7 +98,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TinyBCDec\TinyBCDec.csproj"/>
+        <ProjectReference Include="..\TinyBCSharp\TinyBCSharp.csproj"/>
     </ItemGroup>
 
 </Project>
