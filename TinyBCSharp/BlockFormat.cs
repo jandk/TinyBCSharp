@@ -1,4 +1,4 @@
-﻿namespace TinyBCDec
+﻿namespace TinyBCSharp
 {
     public enum BlockFormat
     {

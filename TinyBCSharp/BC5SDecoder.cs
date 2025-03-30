@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TinyBCDec
+namespace TinyBCSharp
 {
     internal class BC5SDecoder : BlockDecoder
     {

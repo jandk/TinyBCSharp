@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TinyBCDec
+namespace TinyBCSharp
 {
     public abstract class BlockDecoder
     {

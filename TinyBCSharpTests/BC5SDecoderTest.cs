@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using NUnit.Framework;
-using TinyBCDec;
+using TinyBCSharp;
 
 namespace TinyBCSharpTests
 {

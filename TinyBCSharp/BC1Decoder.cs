@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace TinyBCDec
+namespace TinyBCSharp
 {
     internal class BC1Decoder : BlockDecoder
     {
