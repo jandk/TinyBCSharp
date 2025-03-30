@@ -180,14 +180,6 @@ internal class BC7Decoder() : BPTCDecoder(BlockFormat.BC7, BPP)
         }
     }
 
-    private static void FillInvalidBlock(Span<byte> dst, int stride)
-    {
-        for (var y = 0; y < 4; y++)
-        {
-            dst.Slice(y * stride, 16).Clear();
-        }
-    }
-
     private static int Unpack(int i, int n)
     {
         return i << (8 - n) | i >> (2 * n - 8);

@@ -62,4 +62,30 @@ public class BCTestUtils
                 throw new Exception();
         }
     }
+
+    public static byte[] ReadDdsFp16(string path, int width, int height)
+    {
+        var src = File.ReadAllBytes(path).AsSpan(DdsHeaderSize, width * height * 8);
+        var dst = new byte[src.Length * 6 / 8].AsSpan();
+
+        for (int i = 0, o = 0; i < src.Length; i += 8, o += 6)
+        {
+            src.Slice(i, 6).CopyTo(dst[o..]);
+        }
+
+        return dst.ToArray();
+    }
+
+    public static byte[] ReadDdsFp32(string path, int width, int height)
+    {
+        var src = File.ReadAllBytes(path).AsSpan(DdsHeaderSize, width * height * 16);
+        var dst = new byte[src.Length * 12 / 16].AsSpan();
+
+        for (int i = 0, o = 0; i < src.Length; i += 16, o += 12)
+        {
+            src.Slice(i, 12).CopyTo(dst[o..]);
+        }
+
+        return dst.ToArray();
+    }
 }

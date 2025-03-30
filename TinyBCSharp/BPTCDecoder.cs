@@ -73,6 +73,14 @@ internal abstract class BPTCDecoder(BlockFormat format, int pixelStride) : Block
         [0, 4, 9, 13, 17, 21, 26, 30, 34, 38, 43, 47, 51, 55, 60, 64]
     ];
 
+    internal void FillInvalidBlock(Span<byte> dst, int stride)
+    {
+        for (var y = 0; y < 4; y++)
+        {
+            dst.Slice(y * stride, 4 * _pixelStride).Clear();
+        }
+    }
+
     internal static long IndexBits(Bits bits, int numIndexBits, int numPartitions, int partition)
     {
         var indexBits = bits.Get64(numIndexBits * 16 - numPartitions);

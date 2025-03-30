@@ -6,7 +6,7 @@ public abstract class BlockDecoder
     private const int BlockHeight = 4;
 
     private readonly BlockFormat _format;
-    private readonly int _pixelStride;
+    internal readonly int _pixelStride;
 
     internal BlockDecoder(BlockFormat format, int pixelStride)
     {
@@ -16,43 +16,25 @@ public abstract class BlockDecoder
 
     public static BlockDecoder Create(BlockFormat format)
     {
-        switch (format)
+        return format switch
         {
-            case BlockFormat.BC1:
-                return new BC1Decoder(BC1Mode.Normal);
-            case BlockFormat.BC1NoAlpha:
-                return new BC1Decoder(BC1Mode.Opaque);
-            case BlockFormat.BC2:
-                return new BC2Decoder();
-            case BlockFormat.BC3:
-                return new BC3Decoder();
-            case BlockFormat.BC4U:
-                return new BC4UDecoder(1);
-            case BlockFormat.BC4S:
-                return new BC4SDecoder(1);
-            case BlockFormat.BC5U:
-                return new BC5UDecoder(false);
-            case BlockFormat.BC5UReconstructZ:
-                return new BC5UDecoder(true);
-            case BlockFormat.BC5S:
-                return new BC5SDecoder(false);
-            case BlockFormat.BC5SReconstructZ:
-                return new BC5SDecoder(true);
-            case BlockFormat.BC6HUf16:
-                break;
-            case BlockFormat.BC6HSf16:
-                break;
-            case BlockFormat.BC6HUf32:
-                break;
-            case BlockFormat.BC6HSf32:
-                break;
-            case BlockFormat.BC7:
-                return new BC7Decoder();
-            default:
-                throw new ArgumentOutOfRangeException(nameof(format), format, null);
-        }
-
-        throw new ArgumentOutOfRangeException(nameof(format), format, null);
+            BlockFormat.BC1 => new BC1Decoder(BC1Mode.Normal),
+            BlockFormat.BC1NoAlpha => new BC1Decoder(BC1Mode.Opaque),
+            BlockFormat.BC2 => new BC2Decoder(),
+            BlockFormat.BC3 => new BC3Decoder(),
+            BlockFormat.BC4U => new BC4UDecoder(1),
+            BlockFormat.BC4S => new BC4SDecoder(1),
+            BlockFormat.BC5U => new BC5UDecoder(false),
+            BlockFormat.BC5UReconstructZ => new BC5UDecoder(true),
+            BlockFormat.BC5S => new BC5SDecoder(false),
+            BlockFormat.BC5SReconstructZ => new BC5SDecoder(true),
+            BlockFormat.BC6HUf16 => new BC6HDecoder(false, false),
+            BlockFormat.BC6HSf16 => new BC6HDecoder(true, false),
+            BlockFormat.BC6HUf32 => new BC6HDecoder(false, true),
+            BlockFormat.BC6HSf32 => new BC6HDecoder(true, true),
+            BlockFormat.BC7 => new BC7Decoder(),
+            _ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
+        };
     }
 
     public abstract void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride);
@@ -77,31 +59,31 @@ public abstract class BlockDecoder
             throw new ArgumentException("height must be greater than 0", nameof(height));
         }
 
-        var bytesPerRow = width * _pixelStride;
-        if (dst.Length < height * bytesPerRow)
+        var rowStride = width * _pixelStride;
+        if (dst.Length < height * rowStride)
         {
             throw new ArgumentException("dst.Length must be greater than height * bytesPerLine", nameof(dst));
         }
 
         // Objects.checkFromIndexSize(srcPos, format.size(width, height), src.length);
 
-        var bytesPerBlock = BytesPerBlock(_format);
+        var blockStride = BytesPerBlock(_format);
 
         var srcPos = 0;
         for (var y = 0; y < height; y += BlockHeight)
         {
-            var dstPos = y * bytesPerRow;
+            var dstPos = y * rowStride;
             for (var x = 0; x < width; x += BlockWidth)
             {
                 var dstOffset = dstPos + x * _pixelStride;
                 if (height - y < 4 || width - x < 4)
                 {
-                    PartialBlock(width, height, src[srcPos..], dst[dstOffset..], x, y, bytesPerRow);
+                    PartialBlock(width, height, src[srcPos..], dst[dstOffset..], x, y, rowStride);
                     continue;
                 }
 
-                DecodeBlock(src[srcPos..], dst[dstOffset..], bytesPerRow);
-                srcPos += bytesPerBlock;
+                DecodeBlock(src[srcPos..], dst[dstOffset..], rowStride);
+                srcPos += blockStride;
             }
         }
     }

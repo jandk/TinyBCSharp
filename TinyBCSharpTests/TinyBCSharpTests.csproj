@@ -103,10 +103,37 @@
         <Content Include="images\bc7.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <None Remove="images\bc6h_sf16_32.dds"/>
+        <Content Include="images\bc6h_sf16_32.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="images\bc6h_uf16_32.dds"/>
+        <Content Include="images\bc6h_uf16_32.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\TinyBCSharp\TinyBCSharp.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="images\bc6h_sf16.dds"/>
+        <Content Include="images\bc6h_sf16.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="images\bc6h_sf16_16.dds"/>
+        <Content Include="images\bc6h_sf16_16.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="images\bc6h_uf16.dds"/>
+        <Content Include="images\bc6h_uf16.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <None Remove="images\bc6h_uf16_16.dds"/>
+        <Content Include="images\bc6h_uf16_16.dds">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>
