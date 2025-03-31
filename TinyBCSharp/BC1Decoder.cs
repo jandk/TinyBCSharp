@@ -2,19 +2,12 @@
 
 namespace TinyBCSharp;
 
-class BC1Decoder : BlockDecoder
+class BC1Decoder(BC1Mode mode) : BlockDecoder(8, BytesPerPixel)
 {
     const int BytesPerPixel = 4;
 
-    readonly bool _bc2Or3;
-    readonly uint _color3;
-
-
-    internal BC1Decoder(BC1Mode mode) : base(8, BytesPerPixel)
-    {
-        _bc2Or3 = mode == BC1Mode.BC2Or3;
-        _color3 = mode == BC1Mode.Opaque ? 0xFF000000 : 0;
-    }
+    readonly bool _bc2Or3 = mode == BC1Mode.BC2Or3;
+    readonly uint _color3 = mode == BC1Mode.Opaque ? 0xFF000000 : 0;
 
     public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
     {
