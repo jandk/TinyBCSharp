@@ -1,6 +1,7 @@
 ﻿# TinyBCSharp
 
 [![License](https://img.shields.io/github/license/jandk/TinyBCSharp)](https://opensource.org/licenses/MIT)
+[![nuget Version](https://img.shields.io/nuget/v/TinyBCSharp)](https://www.nuget.org/packages/TinyBCSharp/)
 
 ## Description
 
