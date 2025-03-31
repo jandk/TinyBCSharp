@@ -1,4 +1,4 @@
-﻿# tinybcdec
+﻿# TinyBCSharp
 
 [![License](https://img.shields.io/github/license/jandk/TinyBCSharp)](https://opensource.org/licenses/MIT)
 
