@@ -13,7 +13,7 @@ namespace TinyBCSharpTests
 
             var actual = BlockDecoder.Create(BlockFormat.BC4U)
                 .Decode(157, 119, src);
-            var expected = BCTestUtils.ReadPng("images/bc4u-part.png", 1);
+            var expected = BCTestUtils.ReadPng("images/bc4u-part.png");
 
             Assert.That(actual, Is.EqualTo(expected));
         }

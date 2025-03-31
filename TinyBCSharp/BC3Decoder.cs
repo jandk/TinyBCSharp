@@ -7,10 +7,10 @@ namespace TinyBCSharp
         private const int BytesPerPixel = 4;
 
         private readonly BC1Decoder _colorDecoder = new BC1Decoder(BC1Mode.BC2Or3);
-        private readonly BC4UDecoder _alphaDecoder = new BC4UDecoder(BytesPerPixel);
+        private readonly BC4UDecoder _alphaDecoder = new BC4UDecoder(false);
 
         public BC3Decoder()
-            : base(BlockFormat.BC3, 4)
+            : base(16, 4)
         {
         }
 

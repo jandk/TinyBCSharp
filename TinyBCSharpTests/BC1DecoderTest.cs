@@ -12,7 +12,7 @@ namespace TinyBCSharpTests
             var decoder = BlockDecoder.Create(BlockFormat.BC1);
             var src = File.ReadAllBytes("images/bc1a.dds")[BCTestUtils.DdsHeaderSize..];
             var actual = decoder.Decode(256, 256, src);
-            var expected = BCTestUtils.ReadPng("images/bc1a.png", 4);
+            var expected = BCTestUtils.ReadPng("images/bc1a.png");
             Assert.That(actual, Is.EqualTo(expected));
         }
 
@@ -22,7 +22,7 @@ namespace TinyBCSharpTests
             var decoder = BlockDecoder.Create(BlockFormat.BC1);
             var src = File.ReadAllBytes("images/bc1.dds")[BCTestUtils.DdsHeaderSize..];
             var actual = decoder.Decode(256, 256, src);
-            var expected = BCTestUtils.ReadPng("images/bc1.png", 4);
+            var expected = BCTestUtils.ReadPng("images/bc1.png");
             Assert.That(actual, Is.EqualTo(expected));
         }
     }

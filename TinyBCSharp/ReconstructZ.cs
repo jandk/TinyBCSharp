@@ -2,7 +2,7 @@
 
 namespace TinyBCSharp
 {
-    internal class ReconstructZ
+    internal static class ReconstructZ
     {
         private static readonly byte[] Normal = new byte[256 * 256];
 
@@ -22,10 +22,10 @@ namespace TinyBCSharp
 
         internal static void Reconstruct(Span<byte> dst, int lineStride, int pixelStride)
         {
-            for (var y = 0; y < 4; y++)
+            for (var y = 0; y < BlockDecoder.BlockHeight; y++)
             {
                 var dstPos = y * lineStride;
-                for (var x = 0; x < 4; x++)
+                for (var x = 0; x < BlockDecoder.BlockWidth; x++)
                 {
                     var i = dstPos + x * pixelStride;
                     int r = dst[i + 0];

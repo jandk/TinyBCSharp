@@ -13,13 +13,14 @@ namespace TinyBCSharpTests
             var decoder = BlockDecoder.Create(BlockFormat.BC5S);
             var src = File.ReadAllBytes("images/bc5s.dds")[BCTestUtils.DdsHeaderSize..];
             var actual = decoder.Decode(256, 256, src);
-            var expected = BCTestUtils.ReadPng("images/bc5s.png", 3);
+            var expected = BCTestUtils.ReadPng("images/bc5s.png");
 
-            for (var i = 0; i < expected.Length; i += 3)
+            for (var i = 0; i < expected.Length; i += 4)
             {
                 Assert.That(Math.Abs(actual[i + 0] - expected[i + 0]), Is.LessThanOrEqualTo(1));
                 Assert.That(Math.Abs(actual[i + 1] - expected[i + 1]), Is.LessThanOrEqualTo(1));
                 Assert.That(actual[i + 2], Is.Zero);
+                Assert.That(actual[i + 3], Is.EqualTo(expected[i + 3]));
             }
         }
 
@@ -29,17 +30,16 @@ namespace TinyBCSharpTests
             var decoder = BlockDecoder.Create(BlockFormat.BC5SReconstructZ);
             var src = File.ReadAllBytes("images/bc5s.dds")[BCTestUtils.DdsHeaderSize..];
             var actual = decoder.Decode(256, 256, src);
-            var expected = BCTestUtils.ReadPng("images/bc5s_reconstructed.png", 3);
+            var expected = BCTestUtils.ReadPng("images/bc5s_reconstructed.png");
 
-            for (var i = 0; i < expected.Length; i += 3)
+            for (var i = 0; i < expected.Length; i += 4)
             {
                 Assert.That(Math.Abs(actual[i + 0] - expected[i + 0]), Is.LessThanOrEqualTo(1));
                 Assert.That(Math.Abs(actual[i + 1] - expected[i + 1]), Is.LessThanOrEqualTo(1));
+                // texconv sets the channel to 0 outside of range, while I clamp, so I need to do the same
                 if (expected[i + 2] != 0)
-                {
-                    // texconv sets the channel to 0 outside of range, while I clamp, so I need to do the same
                     Assert.That(Math.Abs((actual[i + 2] & 0xFF) - (expected[i + 2] & 0xFF)), Is.LessThanOrEqualTo(1));
-                }
+                Assert.That(actual[i + 3], Is.EqualTo(expected[i + 3]));
             }
         }
     }

@@ -1,29 +1,10 @@
-﻿using System;
-
-namespace TinyBCSharp
+﻿namespace TinyBCSharp
 {
-    internal class BC5SDecoder : BlockDecoder
+    internal class BC5SDecoder : BC5Decoder
     {
-        private const int BytesPerPixel = 3;
-
-        private readonly BC4SDecoder _decoder = new BC4SDecoder(BytesPerPixel);
-        private readonly bool _reconstructZ;
-
         public BC5SDecoder(bool reconstructZ)
-            : base(reconstructZ ? BlockFormat.BC5SReconstructZ : BlockFormat.BC5S, BytesPerPixel)
+            : base(new BC4SDecoder(false), reconstructZ)
         {
-            _reconstructZ = reconstructZ;
-        }
-
-        public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
-        {
-            _decoder.DecodeBlock(src, dst, stride);
-            _decoder.DecodeBlock(src[8..], dst[1..], stride);
-
-            if (_reconstructZ)
-            {
-                ReconstructZ.Reconstruct(dst, stride, BytesPerPixel);
-            }
         }
     }
 }

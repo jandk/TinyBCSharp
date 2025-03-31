@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Buffers.Binary;
+using System.IO;
 using NUnit.Framework;
 using TinyBCSharp;
 
@@ -42,13 +44,46 @@ namespace TinyBCSharpTests
             Assert.That(actual, Is.EqualTo(expected));
         }
 
-        // [Test]
-        // public void TestBC6HInvalidBlock()
-        // {
-        //     var src = new byte[16];
-        //     var actual = BlockDecoder.Create(BlockFormat.BC6H).Decode(4, 4, src);
-        //     var expected = new byte[16 * 4];
-        //     Assert.That(actual, Is.EqualTo(expected));
-        // }
+        [Test]
+        public void TestBC6HInvalidBlockF16()
+        {
+            byte[] invalidModes = { 0b10011, 0b10111, 0b11011, 0b11111 };
+
+            var expected = new byte[16 * 8];
+            var span = expected.AsSpan()[6..];
+            for (var i = 0; i < expected.Length; i += 8)
+            {
+                BinaryPrimitives.WriteInt16LittleEndian(span[i..], 0x3C00);
+            }
+
+            var src = new byte[16];
+            foreach (var invalidMode in invalidModes)
+            {
+                src[0] = invalidMode;
+                var actual = BlockDecoder.Create(BlockFormat.BC6HUf16).Decode(4, 4, src);
+                Assert.That(actual, Is.EqualTo(expected));
+            }
+        }
+
+        [Test]
+        public void TestBC6HInvalidBlockF32()
+        {
+            byte[] invalidModes = { 0b10011, 0b10111, 0b11011, 0b11111 };
+
+            var expected = new byte[16 * 16];
+            var span = expected.AsSpan()[12..];
+            for (var i = 0; i < expected.Length; i += 16)
+            {
+                BinaryPrimitives.WriteInt32LittleEndian(span[i..], 0x3F800000);
+            }
+
+            var src = new byte[16];
+            foreach (var invalidMode in invalidModes)
+            {
+                src[0] = invalidMode;
+                var actual = BlockDecoder.Create(BlockFormat.BC6HUf32).Decode(4, 4, src);
+                Assert.That(actual, Is.EqualTo(expected));
+            }
+        }
     }
 }

@@ -12,7 +12,7 @@ namespace TinyBCSharp
 
 
         internal BC1Decoder(BC1Mode mode)
-            : base(mode == BC1Mode.Opaque ? BlockFormat.BC1NoAlpha : BlockFormat.BC1, BytesPerPixel)
+            : base(8, BytesPerPixel)
         {
             _bc2Or3 = mode == BC1Mode.BC2Or3;
             _color3 = mode == BC1Mode.Opaque ? 0xFF000000 : 0;
@@ -59,12 +59,14 @@ namespace TinyBCSharp
             }
 
             var indices = BinaryPrimitives.ReadInt32LittleEndian(src[4..]);
-            for (var y = 0; y < 4; y++)
+            for (var y = 0; y < BlockHeight; y++)
             {
                 var dstPos = y * stride;
-                for (var x = 0; x < 4; x++)
+                for (var x = 0; x < BlockWidth; x++)
                 {
-                    BinaryPrimitives.WriteUInt32LittleEndian(dst[(dstPos + 4 * x)..], colors[indices & 3]);
+                    var index = dstPos + x * BytesPerPixel;
+                    var color = colors[indices & 3];
+                    BinaryPrimitives.WriteUInt32LittleEndian(dst[index..], color);
                     indices >>= 2;
                 }
             }

@@ -4,6 +4,8 @@ namespace TinyBCSharp
 {
     internal abstract class BPTCDecoder : BlockDecoder
     {
+        private const int BytesPerPixel = 4;
+
         internal static readonly uint[][] Partitions =
         {
             Array.Empty<uint>(),
@@ -77,16 +79,9 @@ namespace TinyBCSharp
             new byte[] { 0, 4, 9, 13, 17, 21, 26, 30, 34, 38, 43, 47, 51, 55, 60, 64 }
         };
 
-        protected BPTCDecoder(BlockFormat format, int pixelStride) : base(format, pixelStride)
+        protected BPTCDecoder(int bytesPerBlock, int bytesPerPixel)
+            : base(bytesPerBlock, bytesPerPixel)
         {
-        }
-
-        internal void FillInvalidBlock(Span<byte> dst, int stride)
-        {
-            for (var y = 0; y < 4; y++)
-            {
-                dst.Slice(y * stride, 4 * _pixelStride).Clear();
-            }
         }
 
         internal static long IndexBits(Bits bits, int numIndexBits, int numPartitions, int partition)

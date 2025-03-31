@@ -19,7 +19,8 @@ namespace TinyBCSharp
             new Mode(2, 6, 0, 0, 5, 5, 1, 0, 2, 0)
         };
 
-        public BC7Decoder() : base(BlockFormat.BC7, BytesPerPixel)
+        public BC7Decoder()
+            : base(16, BytesPerPixel)
         {
         }
 
@@ -125,10 +126,10 @@ namespace TinyBCSharp
             var mask1 = (1 << mode.ib1) - 1;
             var mask2 = (1 << mode.ib2) - 1;
 
-            for (var y = 0; y < 4; y++)
+            for (var y = 0; y < BlockHeight; y++)
             {
                 var dstPos = y * stride;
-                for (var x = 0; x < 4; x++)
+                for (var x = 0; x < BlockWidth; x++)
                 {
                     int weight1 = weights1[(int)(indexBits1 & mask1)];
                     var cWeight = weight1;
@@ -174,8 +175,8 @@ namespace TinyBCSharp
                     }
 
                     var index = dstPos + x * BytesPerPixel;
-                    var pixel = r | g << 8 | b << 16 | a << 24;
-                    BinaryPrimitives.WriteInt32LittleEndian(dst[index..], pixel);
+                    var color = r | g << 8 | b << 16 | a << 24;
+                    BinaryPrimitives.WriteInt32LittleEndian(dst[index..], color);
                 }
             }
         }
@@ -191,6 +192,14 @@ namespace TinyBCSharp
             }
 
             return 8;
+        }
+
+        private static void FillInvalidBlock(Span<byte> dst, int stride)
+        {
+            for (var y = 0; y < BlockHeight; y++)
+            {
+                dst.Slice(y * stride, BlockWidth * BytesPerPixel).Clear();
+            }
         }
 
         private static int Unpack(int i, int n)

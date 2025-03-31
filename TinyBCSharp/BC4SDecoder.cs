@@ -3,10 +3,10 @@ using System.Buffers.Binary;
 
 namespace TinyBCSharp
 {
-    internal class BC4SDecoder : BlockDecoder
+    internal class BC4SDecoder : BC4Decoder
     {
-        public BC4SDecoder(int pixelStride)
-            : base(BlockFormat.BC4S, pixelStride)
+        public BC4SDecoder(bool grayscale)
+            : base(grayscale)
         {
         }
 
@@ -15,8 +15,8 @@ namespace TinyBCSharp
             var block = BinaryPrimitives.ReadInt64LittleEndian(src);
 
             // @formatter:off
-            var a0 = (sbyte)  block;
-            var a1 = (sbyte) (block >> 8);
+            var a0 = (int)(sbyte)  block;
+            var a1 = (int)(sbyte) (block >> 8);
 
             var alphas = (stackalloc byte[8]);
             alphas[0] = Scale127(a0);
@@ -39,16 +39,7 @@ namespace TinyBCSharp
             // @formatter:on
 
             var indices = block >> 16;
-            for (var y = 0; y < 4; y++)
-            {
-                var dstPos = y * stride;
-                for (var x = 0; x < 4; x++)
-                {
-                    var alpha = alphas[(int)(indices & 7)];
-                    dst[dstPos + x * _pixelStride] = alpha;
-                    indices >>= 3;
-                }
-            }
+            Write(dst, stride, alphas, indices);
         }
 
         private static byte Scale127(int i) => (byte)((i * 129 + 16384) >> 7);

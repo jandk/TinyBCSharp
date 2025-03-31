@@ -5,6 +5,9 @@ namespace TinyBCSharp
 {
     internal class BC6HDecoder : BPTCDecoder
     {
+        private const short OneHalf = 0x3C00;
+        private const int OneSingle = 0x3F800000; 
+        
         // @formatter:off
         private static readonly Mode[] Modes =
         {
@@ -29,7 +32,7 @@ namespace TinyBCSharp
         private readonly bool _asSingle;
 
         public BC6HDecoder(bool signed, bool asSingle)
-            : base(signed ? BlockFormat.BC6HSf16 : BlockFormat.BC6HUf16, asSingle ? 12 : 6)
+            : base(16, asSingle ? 16 : 8)
         {
             _signed = signed;
             _asSingle = asSingle;
@@ -108,10 +111,10 @@ namespace TinyBCSharp
             var indexBits = IndexBits(bits, ib, numPartitions, partition);
             var weights = Weights[ib];
             var mask = (1 << ib) - 1;
-            for (var y = 0; y < 4; y++)
+            for (var y = 0; y < BlockHeight; y++)
             {
                 var dstPos = y * stride;
-                for (var x = 0; x < 4; x++)
+                for (var x = 0; x < BlockWidth; x++)
                 {
                     int weight = weights[(int)(indexBits & mask)];
                     indexBits >>= ib;
@@ -126,9 +129,39 @@ namespace TinyBCSharp
                     partitions >>= 2;
 
                     if (_asSingle)
-                        WritePixelF32(dst[(dstPos + x * _pixelStride)..], r, g, b);
+                        WritePixelF32(dst[(dstPos + x * 16)..], r, g, b);
                     else
-                        WritePixelF16(dst[(dstPos + x * _pixelStride)..], r, g, b);
+                        WritePixelF16(dst[(dstPos + x * 8)..], r, g, b);
+                }
+            }
+        }
+
+        private void FillInvalidBlock(Span<byte> dst, int stride)
+        {
+            if (_asSingle)
+            {
+                for (var y = 0; y < BlockHeight; y++)
+                {
+                    int dstPos = y * stride;
+                    dst.Slice(dstPos, 4 * 16).Clear();
+                    for (var x = 0; x < BlockWidth; x++)
+                    {
+                        int index = dstPos + x * 16 + 12;
+                        BinaryPrimitives.WriteInt32LittleEndian(dst[index..], OneSingle);
+                    }
+                }
+            }
+            else
+            {
+                for (var y = 0; y < BlockHeight; y++)
+                {
+                    int dstPos = y * stride;
+                    dst.Slice(dstPos, 4 * 8).Clear();
+                    for (var x = 0; x < BlockWidth; x++)
+                    {
+                        int index = dstPos + x * 8 + 6;
+                        BinaryPrimitives.WriteInt16LittleEndian(dst[index..], OneHalf);
+                    }
                 }
             }
         }
@@ -223,22 +256,23 @@ namespace TinyBCSharp
 
         private static void WritePixelF16(Span<byte> dst, short r, short g, short b)
         {
-            BinaryPrimitives.WriteInt16LittleEndian(dst, r);
+            BinaryPrimitives.WriteInt16LittleEndian(dst[0..], r);
             BinaryPrimitives.WriteInt16LittleEndian(dst[2..], g);
             BinaryPrimitives.WriteInt16LittleEndian(dst[4..], b);
+            BinaryPrimitives.WriteInt16LittleEndian(dst[6..], OneHalf);
         }
 
         private static void WritePixelF32(Span<byte> dst, short r, short g, short b)
         {
-            WriteHalfAsSingle(dst, r);
-            WriteHalfAsSingle(dst[4..], g);
-            WriteHalfAsSingle(dst[8..], b);
+            BinaryPrimitives.WriteInt32LittleEndian(dst[0..], HalfToFloat32Bits(r));
+            BinaryPrimitives.WriteInt32LittleEndian(dst[4..], HalfToFloat32Bits(g));
+            BinaryPrimitives.WriteInt32LittleEndian(dst[8..], HalfToFloat32Bits(b));
+            BinaryPrimitives.WriteInt32LittleEndian(dst[12..], OneSingle);
         }
 
-        private static void WriteHalfAsSingle(Span<byte> dst, short value)
+        private static int HalfToFloat32Bits(short value)
         {
-            BinaryPrimitives.WriteInt32LittleEndian(dst,
-                BitConverter.SingleToInt32Bits(Float16ToFloat(value)));
+            return BitConverter.SingleToInt32Bits(Float16ToFloat(value));
         }
 
         private static float Float16ToFloat(short floatBinary16)

@@ -3,20 +3,20 @@ using System.Buffers.Binary;
 
 namespace TinyBCSharp
 {
-    internal class BC4UDecoder : BlockDecoder
+    internal class BC4UDecoder : BC4Decoder
     {
-        public BC4UDecoder(int pixelStride)
-            : base(BlockFormat.BC4U, pixelStride)
+        public BC4UDecoder(bool grayscale)
+            : base(grayscale)
         {
         }
 
         public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
         {
-            var block = BinaryPrimitives.ReadUInt64LittleEndian(src);
+            var block = BinaryPrimitives.ReadInt64LittleEndian(src);
 
             // @formatter:off
-            var a0 = (uint)  block       & 0xFF;
-            var a1 = (uint) (block >> 8) & 0xFF;
+            var a0 = (int)  block       & 0xFF;
+            var a1 = (int) (block >> 8) & 0xFF;
 
             var alphas = (stackalloc byte[8]);
             alphas[0] = (byte)a0;
@@ -39,19 +39,10 @@ namespace TinyBCSharp
             // @formatter:on
 
             var indices = block >> 16;
-            for (var y = 0; y < 4; y++)
-            {
-                var dstPos = y * stride;
-                for (var x = 0; x < 4; x++)
-                {
-                    var alpha = alphas[(int)(indices & 7)];
-                    dst[dstPos + x * _pixelStride] = alpha;
-                    indices >>= 3;
-                }
-            }
+            Write(dst, stride, alphas, indices);
         }
 
-        private static byte Scale1785(uint i) => (byte)((i * 585 + 2010) >> 12);
-        private static byte Scale1275(uint i) => (byte)((i * 819 + 1893) >> 12);
+        private static byte Scale1785(int i) => (byte)((i * 585 + 2010) >> 12);
+        private static byte Scale1275(int i) => (byte)((i * 819 + 1893) >> 12);
     }
 }
