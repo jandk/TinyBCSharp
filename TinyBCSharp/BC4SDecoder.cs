@@ -39,7 +39,7 @@ class BC4SDecoder(bool grayscale) : BC4Decoder(grayscale)
         Write(dst, stride, alphas, indices);
     }
 
-    private static byte Scale127(int i) => (byte)((i * 129 + 16384) >> 7);
-    private static byte Scale889(int i) => (byte)((i * 75193 + 67108864) >> 19);
-    private static byte Scale635(int i) => (byte)((i * 13159 + 8388708) >> 16);
+    static byte Scale127(int i) => (byte)((i * 129 + 16384) >> 7);
+    static byte Scale889(int i) => (byte)((i * 75193 + 67108864) >> 19);
+    static byte Scale635(int i) => (byte)((i * 13159 + 8388708) >> 16);
 }

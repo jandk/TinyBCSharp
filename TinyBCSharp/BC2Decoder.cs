@@ -14,7 +14,7 @@ class BC2Decoder() : BlockDecoder(16, BytesPerPixel)
         DecodeAlpha(src, dst[3..], stride);
     }
 
-    private static void DecodeAlpha(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
+    static void DecodeAlpha(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
     {
         var alphas = BinaryPrimitives.ReadUInt64LittleEndian(src);
         for (var y = 0; y < BlockHeight; y++)
