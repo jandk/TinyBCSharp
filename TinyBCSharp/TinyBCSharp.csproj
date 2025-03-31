@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>8</LangVersion>
-        <Version>0.1</Version>
+        <Version>0.1.1</Version>
         <Title>TinyBCSharp</Title>
         <Authors>JanDK</Authors>
         <Company>Twofold</Company>
