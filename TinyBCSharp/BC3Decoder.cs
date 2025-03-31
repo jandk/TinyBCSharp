@@ -1,23 +1,15 @@
-﻿using System;
+﻿namespace TinyBCSharp;
 
-namespace TinyBCSharp
+class BC3Decoder() : BlockDecoder(16, 4)
 {
-    internal class BC3Decoder : BlockDecoder
+    const int BytesPerPixel = 4;
+
+    static readonly BC1Decoder ColorDecoder = new(BC1Mode.BC2Or3);
+    static readonly BC4UDecoder AlphaDecoder = new(false);
+
+    public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
     {
-        private const int BytesPerPixel = 4;
-
-        private readonly BC1Decoder _colorDecoder = new BC1Decoder(BC1Mode.BC2Or3);
-        private readonly BC4UDecoder _alphaDecoder = new BC4UDecoder(false);
-
-        public BC3Decoder()
-            : base(16, 4)
-        {
-        }
-
-        public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
-        {
-            _colorDecoder.DecodeBlock(src[8..], dst, stride);
-            _alphaDecoder.DecodeBlock(src, dst[3..], stride);
-        }
+        ColorDecoder.DecodeBlock(src[8..], dst, stride);
+        AlphaDecoder.DecodeBlock(src, dst[3..], stride);
     }
 }

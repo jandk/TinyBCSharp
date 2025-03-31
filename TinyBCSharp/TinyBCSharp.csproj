@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <Nullable>enable</Nullable>
-        <LangVersion>8</LangVersion>
-        <Version>0.1.1</Version>
         <Title>TinyBCSharp</Title>
         <Authors>JanDK</Authors>
         <Company>Twofold</Company>
@@ -16,10 +12,15 @@
         <PackageTags>bc1;bc2;bc3;bc4;bc5;bc6;bc7;bcn;texture</PackageTags>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/jandk/TinyBCSharp</RepositoryUrl>
-
-        <!-- Debugging -->
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)../README.md" Pack="true" PackagePath="/" />
+        <PackageReference Include="MinVer" Version="6.0.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
 
 </Project>
