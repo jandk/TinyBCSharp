@@ -84,7 +84,7 @@ namespace TinyBCSharp
         {
         }
 
-        internal static long IndexBits(Bits bits, int numIndexBits, int numPartitions, int partition)
+        internal static long IndexBits(ref Bits bits, int numIndexBits, int numPartitions, int partition)
         {
             var indexBits = bits.Get64(numIndexBits * 16 - numPartitions);
             indexBits = InsertZeroBit(indexBits, numIndexBits - 1);

@@ -27,7 +27,7 @@ namespace TinyBCSharp
         public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
         {
             var bits = Bits.From(src);
-            var modeIndex = ReadModeIndex(bits);
+            var modeIndex = ReadModeIndex(ref bits);
             if (modeIndex >= Modes.Length)
             {
                 FillInvalidBlock(dst, stride);
@@ -119,8 +119,8 @@ namespace TinyBCSharp
 
             // Let's try a new method
             var partitions = Partitions[mode.ns][partition];
-            var indexBits1 = IndexBits(bits, mode.ib1, mode.ns, (int)partition);
-            var indexBits2 = IndexBits(bits, mode.ib2, mode.ns, (int)partition);
+            var indexBits1 = IndexBits(ref bits, mode.ib1, mode.ns, partition);
+            var indexBits2 = IndexBits(ref bits, mode.ib2, mode.ns, partition);
             var weights1 = Weights[mode.ib1];
             var weights2 = Weights[mode.ib2];
             var mask1 = (1 << mode.ib1) - 1;
@@ -181,7 +181,7 @@ namespace TinyBCSharp
             }
         }
 
-        private static int ReadModeIndex(Bits bits)
+        private static int ReadModeIndex(ref Bits bits)
         {
             for (var mode = 0; mode < 8; mode++)
             {

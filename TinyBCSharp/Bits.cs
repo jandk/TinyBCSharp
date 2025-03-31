@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 
 namespace TinyBCSharp
 {
-    internal class Bits
+    internal struct Bits
     {
         private ulong _lo;
         private ulong _hi;
