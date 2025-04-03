@@ -10,7 +10,6 @@ namespace TinyBCSharp
         private readonly bool _bc2Or3;
         private readonly uint _color3;
 
-
         internal BC1Decoder(BC1Mode mode)
             : base(8, BytesPerPixel)
         {
@@ -20,9 +19,11 @@ namespace TinyBCSharp
 
         public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
         {
+            var block = BinaryPrimitives.ReadUInt64LittleEndian(src);
+            
             // @formatter:off
-            uint c0 = BinaryPrimitives.ReadUInt16LittleEndian(src);
-            uint c1 = BinaryPrimitives.ReadUInt16LittleEndian(src[2..]);
+            var c0 = (uint) block        & 0xFFFF;
+            var c1 = (uint)(block >> 16) & 0xFFFF;
 
             var r0 = (c0 >> 11) & 0x1F;
             var g0 = (c0 >>  5) & 0x3F;
@@ -36,7 +37,6 @@ namespace TinyBCSharp
             var colors = (stackalloc uint[4]);
             colors[0] = RGB(Scale031(r0), Scale063(g0), Scale031(b0));
             colors[1] = RGB(Scale031(r1), Scale063(g1), Scale031(b1));
-            colors[3] = _color3;
 
             if (c0 > c1 || _bc2Or3)
             {
@@ -56,9 +56,10 @@ namespace TinyBCSharp
                 var g2 = Scale126(g0 + g1);
                 var b2 = Scale062(b0 + b1);
                 colors[2] = RGB(r2, g2, b2);
+                colors[3] = _color3;
             }
 
-            var indices = BinaryPrimitives.ReadInt32LittleEndian(src[4..]);
+            var indices = (int)(block >> 32);
             for (var y = 0; y < BlockHeight; y++)
             {
                 var dstPos = y * stride;

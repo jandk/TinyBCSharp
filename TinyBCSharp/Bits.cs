@@ -23,9 +23,8 @@ namespace TinyBCSharp
 
         internal long Get64(int count)
         {
-            var mask = (1UL << count) - 1;
-            var bits = _lo & mask;
-            _lo = (_lo >> count) | ((_hi & mask) << (64 - count));
+            var bits = _lo & ((1UL << count) - 1);
+            _lo = (_lo >> count) | (_hi << (64 - count));
             _hi = (_hi >> count);
             return (long)bits;
         }

@@ -9,14 +9,14 @@ namespace TinyBCSharp
 
         private static readonly Mode[] Modes =
         {
-            new Mode(3, 4, 0, 0, 4, 0, 1, 0, 3, 0),
-            new Mode(2, 6, 0, 0, 6, 0, 0, 1, 3, 0),
-            new Mode(3, 6, 0, 0, 5, 0, 0, 0, 2, 0),
-            new Mode(2, 6, 0, 0, 7, 0, 1, 0, 2, 0),
-            new Mode(1, 0, 2, 1, 5, 6, 0, 0, 2, 3),
-            new Mode(1, 0, 2, 0, 7, 8, 0, 0, 2, 2),
-            new Mode(1, 0, 0, 0, 7, 7, 1, 0, 4, 0),
-            new Mode(2, 6, 0, 0, 5, 5, 1, 0, 2, 0)
+            new Mode(3, 4, F, F, 4, 0, T, F, 3, 0),
+            new Mode(2, 6, F, F, 6, 0, F, T, 3, 0),
+            new Mode(3, 6, F, F, 5, 0, F, F, 2, 0),
+            new Mode(2, 6, F, F, 7, 0, T, F, 2, 0),
+            new Mode(1, 0, T, T, 5, 6, F, F, 2, 3),
+            new Mode(1, 0, T, F, 7, 8, F, F, 2, 2),
+            new Mode(1, 0, F, F, 7, 7, T, F, 4, 0),
+            new Mode(2, 6, F, F, 5, 5, T, F, 2, 0)
         };
 
         public BC7Decoder()
@@ -36,9 +36,9 @@ namespace TinyBCSharp
 
             var mode = Modes[modeIndex];
 
-            var partition = bits.Get(mode.pb);
-            var rotation = bits.Get(mode.rb);
-            var selection = bits.Get(mode.isb) != 0;
+            var partition = mode.pb != 0 ? bits.Get(mode.pb) : 0;
+            var rotation = mode.rb ? bits.Get(2) : 0;
+            var selection = mode.isb && bits.Get(1) != 0;
 
             // Great, switching from an int[][] to an int[], increased perf by 40%.
             // I'll take the small readability hit.
@@ -64,7 +64,7 @@ namespace TinyBCSharp
             }
 
             // Read endpoint p-bits
-            if (mode.epb != 0)
+            if (mode.epb)
             {
                 for (var i = 0; i < numColors; i++)
                 {
@@ -77,7 +77,7 @@ namespace TinyBCSharp
             }
 
             // Read shared p-bits
-            if (mode.spb != 0)
+            if (mode.spb)
             {
                 var sBit1 = bits.Get1();
                 var sBit2 = bits.Get1();
@@ -91,8 +91,9 @@ namespace TinyBCSharp
             }
 
             // Unpack colors
-            var colorBits = mode.cb + (mode.epb + mode.spb);
-            var alphaBits = mode.ab + (mode.epb + mode.spb);
+            var extraBits = (mode.epb ? 1 : 0) + (mode.spb ? 1 : 0);
+            var colorBits = mode.cb + extraBits;
+            var alphaBits = mode.ab + extraBits;
             for (var i = 0; i < numColors; i++)
             {
                 if (colorBits < 8)
@@ -211,16 +212,16 @@ namespace TinyBCSharp
         {
             internal byte ns;
             internal byte pb;
-            internal byte rb;
-            internal byte isb;
+            internal bool rb;
+            internal bool isb;
             internal byte cb;
             internal byte ab;
-            internal byte epb;
-            internal byte spb;
+            internal bool epb;
+            internal bool spb;
             internal byte ib1;
             internal byte ib2;
 
-            internal Mode(byte ns, byte pb, byte rb, byte isb, byte cb, byte ab, byte epb, byte spb, byte ib1, byte ib2)
+            internal Mode(byte ns, byte pb, bool rb, bool isb, byte cb, byte ab, bool epb, bool spb, byte ib1, byte ib2)
             {
                 this.ns = ns;
                 this.pb = pb;

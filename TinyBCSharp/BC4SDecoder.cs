@@ -21,7 +21,6 @@ namespace TinyBCSharp
             var alphas = (stackalloc byte[8]);
             alphas[0] = Scale127(a0);
             alphas[1] = Scale127(a1);
-            alphas[7] = 0xFF;
             
             if (a0 > a1) {
                 alphas[2] = Scale889(6 * a0 +     a1);
@@ -35,6 +34,7 @@ namespace TinyBCSharp
                 alphas[3] = Scale635(3 * a0 + 2 * a1);
                 alphas[4] = Scale635(2 * a0 + 3 * a1);
                 alphas[5] = Scale635(    a0 + 4 * a1);
+                alphas[7] = 0xFF;
             }
             // @formatter:on
 

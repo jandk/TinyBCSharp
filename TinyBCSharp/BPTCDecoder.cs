@@ -4,7 +4,8 @@ namespace TinyBCSharp
 {
     internal abstract class BPTCDecoder : BlockDecoder
     {
-        private const int BytesPerPixel = 4;
+        internal const bool T = true;
+        internal const bool F = false;
 
         internal static readonly uint[][] Partitions =
         {
