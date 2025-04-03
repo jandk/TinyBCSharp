@@ -1,0 +1,9 @@
+<Project>
+    <PropertyGroup>
+        <LangVersion>13</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+</Project>

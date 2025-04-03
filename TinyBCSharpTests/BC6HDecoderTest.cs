@@ -47,7 +47,7 @@ public class BC6HDecoderTest
     [Test]
     public void TestBC6HInvalidBlockF16()
     {
-        byte[] invalidModes = { 0b10011, 0b10111, 0b11011, 0b11111 };
+        byte[] invalidModes = [0b10011, 0b10111, 0b11011, 0b11111];
 
         var expected = new byte[16 * 8];
         var span = expected.AsSpan()[6..];
@@ -68,7 +68,7 @@ public class BC6HDecoderTest
     [Test]
     public void TestBC6HInvalidBlockF32()
     {
-        byte[] invalidModes = { 0b10011, 0b10111, 0b11011, 0b11111 };
+        byte[] invalidModes = [0b10011, 0b10111, 0b11011, 0b11111];
 
         var expected = new byte[16 * 16];
         var span = expected.AsSpan()[12..];

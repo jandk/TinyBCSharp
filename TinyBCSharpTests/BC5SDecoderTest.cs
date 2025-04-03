@@ -38,7 +38,10 @@ public class BC5SDecoderTest
             Assert.That(Math.Abs(actual[i + 1] - expected[i + 1]), Is.LessThanOrEqualTo(1));
             // texconv sets the channel to 0 outside of range, while I clamp, so I need to do the same
             if (expected[i + 2] != 0)
+            {
                 Assert.That(Math.Abs((actual[i + 2] & 0xFF) - (expected[i + 2] & 0xFF)), Is.LessThanOrEqualTo(1));
+            }
+
             Assert.That(actual[i + 3], Is.EqualTo(expected[i + 3]));
         }
     }

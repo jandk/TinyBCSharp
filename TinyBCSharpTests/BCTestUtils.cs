@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace TinyBCSharpTests;
 
-public class BCTestUtils
+public static class BCTestUtils
 {
     public const int DdsHeaderSize = 148;
 

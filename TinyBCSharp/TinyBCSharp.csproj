@@ -1,8 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Nullable>enable</Nullable>
-        <LangVersion>13</LangVersion>
         <Version>0.1.1</Version>
         <Title>TinyBCSharp</Title>
         <Authors>JanDK</Authors>
@@ -19,7 +17,11 @@
         <!-- Debugging -->
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)../README.md" Pack="true" PackagePath="/"/>
+        <PackageReference Include="MinVer" Version="6.0.0"/>
+    </ItemGroup>
 
 </Project>

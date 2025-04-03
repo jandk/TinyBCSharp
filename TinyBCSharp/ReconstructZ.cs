@@ -2,9 +2,9 @@
 
 namespace TinyBCSharp;
 
-internal static class ReconstructZ
+static class ReconstructZ
 {
-    private static readonly byte[] Normal = new byte[256 * 256];
+    static readonly byte[] Normal = new byte[256 * 256];
 
     static ReconstructZ()
     {

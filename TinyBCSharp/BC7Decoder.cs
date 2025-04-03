@@ -3,31 +3,25 @@ using System.Buffers.Binary;
 
 namespace TinyBCSharp;
 
-internal class BC7Decoder : BPTCDecoder
+class BC7Decoder() : BPTCDecoder(16, BytesPerPixel)
 {
-    private const int BytesPerPixel = 4;
+    const int BytesPerPixel = 4;
 
-    private static readonly Mode[] Modes =
-    {
-        new Mode(3, 4, F, F, 4, 0, T, F, 3, 0),
-        new Mode(2, 6, F, F, 6, 0, F, T, 3, 0),
-        new Mode(3, 6, F, F, 5, 0, F, F, 2, 0),
-        new Mode(2, 6, F, F, 7, 0, T, F, 2, 0),
-        new Mode(1, 0, T, T, 5, 6, F, F, 2, 3),
-        new Mode(1, 0, T, F, 7, 8, F, F, 2, 2),
-        new Mode(1, 0, F, F, 7, 7, T, F, 4, 0),
-        new Mode(2, 6, F, F, 5, 5, T, F, 2, 0)
-    };
-
-    public BC7Decoder()
-        : base(16, BytesPerPixel)
-    {
-    }
+    static readonly Mode[] Modes =
+    [
+        new(3, 4, F, F, 4, 0, T, F, 3, 0),
+        new(2, 6, F, F, 6, 0, F, T, 3, 0),
+        new(3, 6, F, F, 5, 0, F, F, 2, 0),
+        new(2, 6, F, F, 7, 0, T, F, 2, 0),
+        new(1, 0, T, T, 5, 6, F, F, 2, 3),
+        new(1, 0, T, F, 7, 8, F, F, 2, 2),
+        new(1, 0, F, F, 7, 7, T, F, 4, 0),
+        new(2, 6, F, F, 5, 5, T, F, 2, 0)
+    ];
 
     public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
     {
-        var bits = Bits.From(src);
-        var modeIndex = ReadModeIndex(ref bits);
+        var modeIndex = int.TrailingZeroCount(src[0]);
         if (modeIndex >= Modes.Length)
         {
             FillInvalidBlock(dst, stride);
@@ -36,13 +30,16 @@ internal class BC7Decoder : BPTCDecoder
 
         var mode = Modes[modeIndex];
 
-        var partition = mode.pb != 0 ? bits.Get(mode.pb) : 0;
-        var rotation = mode.rb ? bits.Get(2) : 0;
-        var selection = mode.isb && bits.Get(1) != 0;
+        var bits = Bits.From(src);
+        bits.Get(modeIndex + 1);
+
+        var partition = mode.Pb != 0 ? bits.Get(mode.Pb) : 0;
+        var rotation = mode.Rb ? bits.Get(2) : 0;
+        var selection = mode.Isb && bits.Get(1) != 0;
 
         // Great, switching from an int[][] to an int[], increased perf by 40%.
         // I'll take the small readability hit.
-        var numColors = mode.ns * 2;
+        var numColors = mode.Ns * 2;
         var colors = (stackalloc int[numColors * 4]);
 
         // Read colors
@@ -50,21 +47,21 @@ internal class BC7Decoder : BPTCDecoder
         {
             for (var i = 0; i < numColors; i++)
             {
-                colors[i * 4 + c] = bits.Get(mode.cb);
+                colors[i * 4 + c] = bits.Get(mode.Cb);
             }
         }
 
         // Read alphas
-        if (mode.ab != 0)
+        if (mode.Ab != 0)
         {
             for (var i = 0; i < numColors; i++)
             {
-                colors[i * 4 + 3] = bits.Get(mode.ab);
+                colors[i * 4 + 3] = bits.Get(mode.Ab);
             }
         }
 
         // Read endpoint p-bits
-        if (mode.epb)
+        if (mode.Epb)
         {
             for (var i = 0; i < numColors; i++)
             {
@@ -77,7 +74,7 @@ internal class BC7Decoder : BPTCDecoder
         }
 
         // Read shared p-bits
-        if (mode.spb)
+        if (mode.Spb)
         {
             var sBit1 = bits.Get1();
             var sBit2 = bits.Get1();
@@ -91,9 +88,9 @@ internal class BC7Decoder : BPTCDecoder
         }
 
         // Unpack colors
-        var extraBits = (mode.epb ? 1 : 0) + (mode.spb ? 1 : 0);
-        var colorBits = mode.cb + extraBits;
-        var alphaBits = mode.ab + extraBits;
+        var extraBits = (mode.Epb ? 1 : 0) + (mode.Spb ? 1 : 0);
+        var colorBits = mode.Cb + extraBits;
+        var alphaBits = mode.Ab + extraBits;
         for (var i = 0; i < numColors; i++)
         {
             if (colorBits < 8)
@@ -103,14 +100,14 @@ internal class BC7Decoder : BPTCDecoder
                 colors[i * 4 + 2] = Unpack(colors[i * 4 + 2], colorBits);
             }
 
-            if (mode.ab != 0 && alphaBits < 8)
+            if (mode.Ab != 0 && alphaBits < 8)
             {
                 colors[i * 4 + 3] = Unpack(colors[i * 4 + 3], alphaBits);
             }
         }
 
         // Opaque mode
-        if (mode.ab == 0)
+        if (mode.Ab == 0)
         {
             for (var i = 0; i < numColors; i++)
             {
@@ -119,13 +116,13 @@ internal class BC7Decoder : BPTCDecoder
         }
 
         // Let's try a new method
-        var partitions = Partitions[mode.ns][partition];
-        var indexBits1 = IndexBits(ref bits, mode.ib1, mode.ns, partition);
-        var indexBits2 = IndexBits(ref bits, mode.ib2, mode.ns, partition);
-        var weights1 = Weights[mode.ib1];
-        var weights2 = Weights[mode.ib2];
-        var mask1 = (1 << mode.ib1) - 1;
-        var mask2 = (1 << mode.ib2) - 1;
+        var partitions = Partitions[mode.Ns][partition];
+        var indexBits1 = IndexBits(ref bits, mode.Ib1, mode.Ns, partition);
+        var indexBits2 = IndexBits(ref bits, mode.Ib2, mode.Ns, partition);
+        var weights1 = Weights[mode.Ib1];
+        var weights2 = Weights[mode.Ib2];
+        var mask1 = (1 << mode.Ib1) - 1;
+        var mask2 = (1 << mode.Ib2) - 1;
 
         for (var y = 0; y < BlockHeight; y++)
         {
@@ -135,9 +132,9 @@ internal class BC7Decoder : BPTCDecoder
                 int weight1 = weights1[(int)(indexBits1 & mask1)];
                 var cWeight = weight1;
                 var aWeight = weight1;
-                indexBits1 >>= mode.ib1;
+                indexBits1 >>= mode.Ib1;
 
-                if (mode.ib2 != 0)
+                if (mode.Ib2 != 0)
                 {
                     int weight2 = weights2[(int)(indexBits2 & mask2)];
                     if (selection)
@@ -149,7 +146,7 @@ internal class BC7Decoder : BPTCDecoder
                         aWeight = weight2;
                     }
 
-                    indexBits2 >>= mode.ib2;
+                    indexBits2 >>= mode.Ib2;
                 }
 
                 var pIndex = (int)(partitions & 3);
@@ -182,20 +179,7 @@ internal class BC7Decoder : BPTCDecoder
         }
     }
 
-    private static int ReadModeIndex(ref Bits bits)
-    {
-        for (var mode = 0; mode < 8; mode++)
-        {
-            if (bits.Get1() == 1)
-            {
-                return mode;
-            }
-        }
-
-        return 8;
-    }
-
-    private static void FillInvalidBlock(Span<byte> dst, int stride)
+    static void FillInvalidBlock(Span<byte> dst, int stride)
     {
         for (var y = 0; y < BlockHeight; y++)
         {
@@ -203,36 +187,21 @@ internal class BC7Decoder : BPTCDecoder
         }
     }
 
-    private static int Unpack(int i, int n)
+    static int Unpack(int i, int n)
     {
         return i << (8 - n) | i >> (2 * n - 8);
     }
 
-    private struct Mode
-    {
-        internal byte ns;
-        internal byte pb;
-        internal bool rb;
-        internal bool isb;
-        internal byte cb;
-        internal byte ab;
-        internal bool epb;
-        internal bool spb;
-        internal byte ib1;
-        internal byte ib2;
-
-        internal Mode(byte ns, byte pb, bool rb, bool isb, byte cb, byte ab, bool epb, bool spb, byte ib1, byte ib2)
-        {
-            this.ns = ns;
-            this.pb = pb;
-            this.rb = rb;
-            this.isb = isb;
-            this.cb = cb;
-            this.ab = ab;
-            this.epb = epb;
-            this.spb = spb;
-            this.ib1 = ib1;
-            this.ib2 = ib2;
-        }
-    }
+    record struct Mode(
+        byte Ns,
+        byte Pb,
+        bool Rb,
+        bool Isb,
+        byte Cb,
+        byte Ab,
+        bool Epb,
+        bool Spb,
+        byte Ib1,
+        byte Ib2
+    );
 }

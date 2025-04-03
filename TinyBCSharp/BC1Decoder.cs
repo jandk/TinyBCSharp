@@ -3,35 +3,28 @@ using System.Buffers.Binary;
 
 namespace TinyBCSharp;
 
-internal class BC1Decoder : BlockDecoder
+class BC1Decoder(BC1Mode mode) : BlockDecoder(8, BytesPerPixel)
 {
-    private const int BytesPerPixel = 4;
+    const int BytesPerPixel = 4;
 
-    private readonly bool _bc2Or3;
-    private readonly uint _color3;
-
-    internal BC1Decoder(BC1Mode mode)
-        : base(8, BytesPerPixel)
-    {
-        _bc2Or3 = mode == BC1Mode.BC2Or3;
-        _color3 = mode == BC1Mode.Opaque ? 0xFF000000 : 0;
-    }
+    readonly bool _bc2Or3 = mode == BC1Mode.BC2Or3;
+    readonly uint _color3 = mode == BC1Mode.Opaque ? 0xFF000000 : 0;
 
     public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
     {
         var block = BinaryPrimitives.ReadUInt64LittleEndian(src);
             
-            // @formatter:off
-            var c0 = (uint) block        & 0xFFFF;
-            var c1 = (uint)(block >> 16) & 0xFFFF;
+        // @formatter:off
+        var c0 = (uint) block        & 0xFFFF;
+        var c1 = (uint)(block >> 16) & 0xFFFF;
 
-            var r0 = (c0 >> 11) & 0x1F;
-            var g0 = (c0 >>  5) & 0x3F;
-            var b0 =  c0        & 0x1F;
+        var r0 = (c0 >> 11) & 0x1F;
+        var g0 = (c0 >>  5) & 0x3F;
+        var b0 =  c0        & 0x1F;
 
-            var r1 = (c1 >> 11) & 0x1F;
-            var g1 = (c1 >>  5) & 0x3F;
-            var b1 =  c1        & 0x1F;
+        var r1 = (c1 >> 11) & 0x1F;
+        var g1 = (c1 >>  5) & 0x3F;
+        var b1 =  c1        & 0x1F;
         // @formatter:on
 
         var colors = (stackalloc uint[4]);
@@ -73,11 +66,11 @@ internal class BC1Decoder : BlockDecoder
         }
     }
 
-    private static uint RGB(uint r, uint g, uint b) => r | g << 8 | b << 16 | 0xFF000000;
-    private static uint Scale031(uint i) => (i * 527 + 23) >> 6;
-    private static uint Scale063(uint i) => (i * 259 + 33) >> 6;
-    private static uint Scale093(uint i) => (i * 351 + 61) >> 7;
-    private static uint Scale189(uint i) => (i * 2763 + 1039) >> 11;
-    private static uint Scale062(uint i) => (i * 1053 + 125) >> 8;
-    private static uint Scale126(uint i) => (i * 4145 + 1019) >> 11;
+    static uint RGB(uint r, uint g, uint b) => r | g << 8 | b << 16 | 0xFF000000;
+    static uint Scale031(uint i) => (i * 527 + 23) >> 6;
+    static uint Scale063(uint i) => (i * 259 + 33) >> 6;
+    static uint Scale093(uint i) => (i * 351 + 61) >> 7;
+    static uint Scale189(uint i) => (i * 2763 + 1039) >> 11;
+    static uint Scale062(uint i) => (i * 1053 + 125) >> 8;
+    static uint Scale126(uint i) => (i * 4145 + 1019) >> 11;
 }

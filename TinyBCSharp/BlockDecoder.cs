@@ -2,19 +2,10 @@
 
 namespace TinyBCSharp;
 
-public abstract class BlockDecoder
+public abstract class BlockDecoder(int bytesPerBlock, int bytesPerPixel)
 {
     internal const int BlockWidth = 4;
     internal const int BlockHeight = 4;
-
-    private readonly int _bytesPerBlock;
-    private readonly int _bytesPerPixel;
-
-    protected BlockDecoder(int bytesPerBlock, int bytesPerPixel)
-    {
-        _bytesPerBlock = bytesPerBlock;
-        _bytesPerPixel = bytesPerPixel;
-    }
 
     public static BlockDecoder Create(BlockFormat format)
     {
@@ -43,7 +34,7 @@ public abstract class BlockDecoder
 
     public byte[] Decode(int width, int height, ReadOnlySpan<byte> src)
     {
-        var size = width * height * _bytesPerPixel;
+        var size = width * height * bytesPerPixel;
         var dst = new byte[size];
         Decode(width, height, src, dst);
         return dst;
@@ -51,21 +42,11 @@ public abstract class BlockDecoder
 
     public void Decode(int width, int height, ReadOnlySpan<byte> src, Span<byte> dst)
     {
-        if (width <= 0)
-        {
-            throw new ArgumentException("width must be greater than 0", nameof(width));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
 
-        if (height <= 0)
-        {
-            throw new ArgumentException("height must be greater than 0", nameof(height));
-        }
-
-        var rowStride = width * _bytesPerPixel;
-        if (dst.Length < height * rowStride)
-        {
-            throw new ArgumentException("dst.Length must be greater than height * rowStride", nameof(dst));
-        }
+        var rowStride = width * bytesPerPixel;
+        ArgumentOutOfRangeException.ThrowIfLessThan(dst.Length, height * rowStride);
 
         // Objects.checkFromIndexSize(srcPos, format.size(width, height), src.length);
 
@@ -75,26 +56,28 @@ public abstract class BlockDecoder
             var dstPos = y * rowStride;
             for (var x = 0; x < width; x += BlockWidth)
             {
-                var dstOffset = dstPos + x * _bytesPerPixel;
-                if (height >= y + 4 && width >= x + 4)
-                    DecodeBlock(src[srcPos..], dst[dstOffset..], rowStride);
+                var dstOffset = dstPos + x * bytesPerPixel;
+                if (y + BlockHeight > height || x + BlockWidth > width)
+                    PartialBlock(src[srcPos..], width, height, dst[dstOffset..], x, y, rowStride);
                 else
-                    PartialBlock(width, height, src[srcPos..], dst[dstOffset..], x, y, rowStride);
+                    DecodeBlock(src[srcPos..], dst[dstOffset..], rowStride);
 
-                srcPos += _bytesPerBlock;
+                srcPos += bytesPerBlock;
             }
         }
     }
 
-    private void PartialBlock(int width, int height, ReadOnlySpan<byte> src, Span<byte> dst, int x, int y,
-        int rowStride)
+    void PartialBlock(
+        ReadOnlySpan<byte> src, int width, int height,
+        Span<byte> dst, int x, int y, int rowStride
+    )
     {
-        var blockStride = _bytesPerPixel * BlockWidth;
+        var blockStride = bytesPerPixel * BlockWidth;
         var block = (stackalloc byte[BlockHeight * blockStride]);
         DecodeBlock(src, block, blockStride);
 
         var partialHeight = Math.Min(height - y, BlockHeight);
-        var partialStride = Math.Min(width - x, BlockWidth) * _bytesPerPixel;
+        var partialStride = Math.Min(width - x, BlockWidth) * bytesPerPixel;
         for (var yy = 0; yy < partialHeight; yy++)
         {
             block

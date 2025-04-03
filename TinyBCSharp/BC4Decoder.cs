@@ -3,51 +3,49 @@ using System.Buffers.Binary;
 
 namespace TinyBCSharp;
 
-internal abstract class BC4Decoder : BlockDecoder
+abstract class BC4Decoder(bool grayscale)
+    : BlockDecoder(8, BytesPerPixel)
 {
-    private const int BytesPerPixel = 4;
-
-    private readonly bool _grayscale;
-
-    protected BC4Decoder(bool grayscale)
-        : base(8, BytesPerPixel)
-    {
-        _grayscale = grayscale;
-    }
+    const int BytesPerPixel = 4;
 
     protected void Write(Span<byte> dst, int stride, Span<byte> alphas, long indices)
     {
-        if (_grayscale)
-            WriteRGBA(dst, stride, alphas, indices);
+        if (grayscale)
+        {
+            WriteRgba(dst, stride, alphas, indices);
+        }
         else
+        {
             WriteR(dst, stride, alphas, indices);
+        }
     }
 
-    private static void WriteR(Span<byte> dst, int stride, Span<byte> alphas, long indices)
+    static void WriteRgba(Span<byte> dst, int stride, Span<byte> alphas, long indices)
     {
         for (var y = 0; y < BlockHeight; y++)
         {
             var dstPos = y * stride;
             for (var x = 0; x < BlockWidth; x++)
             {
+                var index = dstPos + x * BytesPerPixel;
                 var alpha = alphas[(int)(indices & 7)];
-                dst[dstPos + x * BytesPerPixel] = alpha;
+                var color = (alpha * 0x010101) | unchecked((int)0xFF000000);
+                BinaryPrimitives.WriteInt32LittleEndian(dst[index..], color);
                 indices >>= 3;
             }
         }
     }
 
-    private static void WriteRGBA(Span<byte> dst, int stride, Span<byte> alphas, long indices)
+    static void WriteR(Span<byte> dst, int stride, Span<byte> alphas, long indices)
     {
         for (var y = 0; y < BlockHeight; y++)
         {
             var dstPos = y * stride;
             for (var x = 0; x < BlockWidth; x++)
             {
-                var alpha = alphas[(int)(indices & 7)];
-                var color = (alpha * 0x010101) | unchecked((int)0xFF000000);
                 var index = dstPos + x * BytesPerPixel;
-                BinaryPrimitives.WriteInt32LittleEndian(dst[index..], color);
+                var alpha = alphas[(int)(indices & 7)];
+                dst[index] = alpha;
                 indices >>= 3;
             }
         }
