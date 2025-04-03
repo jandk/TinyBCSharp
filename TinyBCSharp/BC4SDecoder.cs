@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace TinyBCSharp
-{
-    internal class BC4SDecoder : BC4Decoder
-    {
-        public BC4SDecoder(bool grayscale)
-            : base(grayscale)
-        {
-        }
+namespace TinyBCSharp;
 
-        public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
-        {
-            var block = BinaryPrimitives.ReadInt64LittleEndian(src);
+internal class BC4SDecoder : BC4Decoder
+{
+    public BC4SDecoder(bool grayscale)
+        : base(grayscale)
+    {
+    }
+
+    public override void DecodeBlock(ReadOnlySpan<byte> src, Span<byte> dst, int stride)
+    {
+        var block = BinaryPrimitives.ReadInt64LittleEndian(src);
 
             // @formatter:off
             var a0 = (int)(sbyte)  block;
@@ -36,14 +36,13 @@ namespace TinyBCSharp
                 alphas[5] = Scale635(    a0 + 4 * a1);
                 alphas[7] = 0xFF;
             }
-            // @formatter:on
+        // @formatter:on
 
-            var indices = block >> 16;
-            Write(dst, stride, alphas, indices);
-        }
-
-        private static byte Scale127(int i) => (byte)((i * 129 + 16384) >> 7);
-        private static byte Scale889(int i) => (byte)((i * 75193 + 67108864) >> 19);
-        private static byte Scale635(int i) => (byte)((i * 13159 + 8388708) >> 16);
+        var indices = block >> 16;
+        Write(dst, stride, alphas, indices);
     }
+
+    private static byte Scale127(int i) => (byte)((i * 129 + 16384) >> 7);
+    private static byte Scale889(int i) => (byte)((i * 75193 + 67108864) >> 19);
+    private static byte Scale635(int i) => (byte)((i * 13159 + 8388708) >> 16);
 }

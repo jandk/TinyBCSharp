@@ -1,42 +1,41 @@
 ﻿using System;
 using System.Buffers.Binary;
 
-namespace TinyBCSharp
+namespace TinyBCSharp;
+
+internal struct Bits
 {
-    internal struct Bits
+    private ulong _lo;
+    private ulong _hi;
+
+    private Bits(ulong lo, ulong hi)
     {
-        private ulong _lo;
-        private ulong _hi;
+        _lo = lo;
+        _hi = hi;
+    }
 
-        private Bits(ulong lo, ulong hi)
-        {
-            _lo = lo;
-            _hi = hi;
-        }
+    internal static Bits From(ReadOnlySpan<byte> array)
+    {
+        var lo = BinaryPrimitives.ReadUInt64LittleEndian(array);
+        var hi = BinaryPrimitives.ReadUInt64LittleEndian(array[8..]);
+        return new Bits(lo, hi);
+    }
 
-        internal static Bits From(ReadOnlySpan<byte> array)
-        {
-            var lo = BinaryPrimitives.ReadUInt64LittleEndian(array);
-            var hi = BinaryPrimitives.ReadUInt64LittleEndian(array[8..]);
-            return new Bits(lo, hi);
-        }
+    internal long Get64(int count)
+    {
+        var bits = _lo & ((1UL << count) - 1);
+        _lo = (_lo >> count) | (_hi << (64 - count));
+        _hi = (_hi >> count);
+        return (long)bits;
+    }
 
-        internal long Get64(int count)
-        {
-            var bits = _lo & ((1UL << count) - 1);
-            _lo = (_lo >> count) | (_hi << (64 - count));
-            _hi = (_hi >> count);
-            return (long)bits;
-        }
+    internal int Get(int count)
+    {
+        return (int)Get64(count);
+    }
 
-        internal int Get(int count)
-        {
-            return (int)Get64(count);
-        }
-
-        internal int Get1()
-        {
-            return Get(1);
-        }
+    internal int Get1()
+    {
+        return Get(1);
     }
 }
