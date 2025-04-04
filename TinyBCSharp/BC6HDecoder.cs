@@ -96,9 +96,9 @@ class BC6HDecoder(bool signed, bool asSingle)
         }
 
         var ib = numPartitions == 1 ? 4 : 3;
-        var partitions = Partitions[numPartitions][partition];
+        var partitions = Partition(numPartitions, partition);
         var indexBits = IndexBits(ref bits, ib, numPartitions, partition);
-        var weights = Weights[ib];
+        var weights = Weights(ib);
         var mask = (1 << ib) - 1;
         for (var y = 0; y < BlockHeight; y++)
         {

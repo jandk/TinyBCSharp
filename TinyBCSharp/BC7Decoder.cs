@@ -116,11 +116,11 @@ class BC7Decoder()
         }
 
         // Let's try a new method
-        var partitions = Partitions[mode.Ns][partition];
+        var partitions = Partition(mode.Ns, partition);
         var indexBits1 = IndexBits(ref bits, mode.Ib1, mode.Ns, partition);
         var indexBits2 = IndexBits(ref bits, mode.Ib2, mode.Ns, partition);
-        var weights1 = Weights[mode.Ib1];
-        var weights2 = Weights[mode.Ib2];
+        var weights1 = Weights(mode.Ib1);
+        var weights2 = Weights(mode.Ib2);
         var mask1 = (1 << mode.Ib1) - 1;
         var mask2 = (1 << mode.Ib2) - 1;
 
@@ -138,13 +138,9 @@ class BC7Decoder()
                 {
                     int weight2 = weights2[(int)(indexBits2 & mask2)];
                     if (selection)
-                    {
                         cWeight = weight2;
-                    }
                     else
-                    {
                         aWeight = weight2;
-                    }
 
                     indexBits2 >>= mode.Ib2;
                 }
