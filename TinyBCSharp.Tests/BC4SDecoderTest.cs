@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-
-namespace TinyBCSharp.Tests;
+﻿namespace TinyBCSharp.Tests;
 
 public class BC4SDecoderTest
 {

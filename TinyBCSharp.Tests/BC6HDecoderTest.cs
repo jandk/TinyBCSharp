@@ -1,5 +1,4 @@
 ﻿using System.Buffers.Binary;
-using NUnit.Framework;
 
 namespace TinyBCSharp.Tests;
 
