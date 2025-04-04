@@ -1,7 +1,7 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace TinyBCSharpTests;
+namespace TinyBCSharp.Tests;
 
 public static class BCTestUtils
 {

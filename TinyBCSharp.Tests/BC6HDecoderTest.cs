@@ -1,10 +1,7 @@
-﻿using System;
-using System.Buffers.Binary;
-using System.IO;
+﻿using System.Buffers.Binary;
 using NUnit.Framework;
-using TinyBCSharp;
 
-namespace TinyBCSharpTests;
+namespace TinyBCSharp.Tests;
 
 public class BC6HDecoderTest
 {

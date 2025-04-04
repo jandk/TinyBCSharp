@@ -1,9 +1,6 @@
-﻿using System;
-using System.IO;
-using NUnit.Framework;
-using TinyBCSharp;
+﻿using NUnit.Framework;
 
-namespace TinyBCSharpTests;
+namespace TinyBCSharp.Tests;
 
 public class BC5SDecoderTest
 {
