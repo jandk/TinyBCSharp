@@ -1,9 +1,9 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 
 namespace TinyBCSharp;
 
-class BC6HDecoder(bool signed, bool asSingle) : BPTCDecoder(16, asSingle ? 16 : 8)
+class BC6HDecoder(bool signed, bool asSingle)
+    : BPTCDecoder(16, asSingle ? 16 : 8)
 {
     // @formatter:off
     static readonly Mode[] Modes =

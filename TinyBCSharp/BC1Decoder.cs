@@ -1,9 +1,9 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 
 namespace TinyBCSharp;
 
-class BC1Decoder(BC1Mode mode) : BlockDecoder(8, BytesPerPixel)
+class BC1Decoder(BC1Mode mode)
+    : BlockDecoder(8, BytesPerPixel)
 {
     const int BytesPerPixel = 4;
 

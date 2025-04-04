@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Buffers.Binary;
 
 namespace TinyBCSharp;
 
@@ -8,9 +7,17 @@ struct Bits
     ulong _lo;
     ulong _hi;
 
+    Bits(ulong lo, ulong hi)
+    {
+        _lo = lo;
+        _hi = hi;
+    }
+
     internal static Bits From(ReadOnlySpan<byte> array)
     {
-        return MemoryMarshal.Read<Bits>(array);
+        var lo = BinaryPrimitives.ReadUInt64LittleEndian(array);
+        var hi = BinaryPrimitives.ReadUInt64LittleEndian(array[8..]);
+        return new Bits(lo, hi);
     }
 
     internal long Get64(int count)

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 
 namespace TinyBCSharp;
 
-class BC7Decoder() : BPTCDecoder(16, BytesPerPixel)
+class BC7Decoder()
+    : BPTCDecoder(16, BytesPerPixel)
 {
     const int BytesPerPixel = 4;
 
