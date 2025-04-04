@@ -13,8 +13,10 @@
         <PackageTags>bc1;bc2;bc3;bc4;bc5;bc6;bc7;bcn;texture</PackageTags>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/jandk/TinyBCSharp</RepositoryUrl>
+    </PropertyGroup>
 
-        <!-- Debugging -->
+    <!-- Debugging -->
+    <PropertyGroup>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
