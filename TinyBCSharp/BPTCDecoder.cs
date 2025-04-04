@@ -84,6 +84,7 @@ abstract class BPTCDecoder(int bytesPerBlock, int bytesPerPixel)
     {
         return numIndexBits switch
         {
+            0 => ReadOnlySpan<byte>.Empty,
             2 => Weights2,
             3 => Weights3,
             4 => Weights4,
