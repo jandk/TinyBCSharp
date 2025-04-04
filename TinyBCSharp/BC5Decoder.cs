@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TinyBCSharp;
+﻿namespace TinyBCSharp;
 
 abstract class BC5Decoder(BC4Decoder decoder, bool reconstructZ)
     : BlockDecoder(16, BytesPerPixel)

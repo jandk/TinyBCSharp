@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TinyBCSharp;
+﻿namespace TinyBCSharp;
 
 static class ReconstructZ
 {

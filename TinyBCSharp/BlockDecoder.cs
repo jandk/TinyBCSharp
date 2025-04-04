@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TinyBCSharp;
+﻿namespace TinyBCSharp;
 
 public abstract class BlockDecoder(int bytesPerBlock, int bytesPerPixel)
 {

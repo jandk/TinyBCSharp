@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TinyBCSharp;
+﻿namespace TinyBCSharp;
 
 class BC3Decoder()
     : BlockDecoder(16, BytesPerPixel)
