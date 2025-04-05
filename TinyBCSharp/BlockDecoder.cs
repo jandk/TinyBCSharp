@@ -34,41 +34,54 @@ public abstract class BlockDecoder(int bytesPerBlock, int bytesPerPixel)
     {
         var size = width * height * bytesPerPixel;
         var dst = new byte[size];
-        Decode(width, height, src, dst);
+        Decode(src, width, height, dst);
         return dst;
     }
 
-    public void Decode(int width, int height, ReadOnlySpan<byte> src, Span<byte> dst)
+    public void Decode(ReadOnlySpan<byte> src, int width, int height, Span<byte> dst)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
+        Decode(src, width, height, dst, width, height);
+    }
 
-        var rowStride = width * bytesPerPixel;
-        ArgumentOutOfRangeException.ThrowIfLessThan(dst.Length, height * rowStride);
+    public void Decode(
+        ReadOnlySpan<byte> src, int srcWidth, int srcHeight,
+        Span<byte> dst, int dstWidth, int dstHeight)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(srcWidth);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(srcHeight);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(dstWidth);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(dstHeight);
 
-        // Objects.checkFromIndexSize(srcPos, format.size(width, height), src.length);
+        ArgumentOutOfRangeException.ThrowIfLessThan(src.Length, SourceSize(bytesPerBlock, srcWidth, srcHeight));
+        ArgumentOutOfRangeException.ThrowIfLessThan(dst.Length, TargetSize(bytesPerPixel, dstWidth, dstHeight));
 
-        var srcPos = 0;
-        for (var y = 0; y < height; y += BlockHeight)
+        var rowStride = dstWidth * bytesPerPixel;
+        for (int y = 0, srcPos = 0; y < dstHeight; y += BlockHeight)
         {
             var dstPos = y * rowStride;
-            for (var x = 0; x < width; x += BlockWidth)
+            for (var x = 0; x < srcWidth; x += BlockWidth, srcPos += bytesPerBlock)
             {
-                var dstOffset = dstPos + x * bytesPerPixel;
-                if (y + BlockHeight > height || x + BlockWidth > width)
-                    PartialBlock(src[srcPos..], width, height, dst[dstOffset..], x, y, rowStride);
-                else
-                    DecodeBlock(src[srcPos..], dst[dstOffset..], rowStride);
+                if (x >= dstWidth)
+                {
+                    continue;
+                }
 
-                srcPos += bytesPerBlock;
+                var dstOffset = dstPos + x * bytesPerPixel;
+                if (y + BlockHeight <= dstHeight && x + BlockWidth <= dstWidth)
+                {
+                    DecodeBlock(src[srcPos..], dst[dstOffset..], rowStride);
+                }
+                else
+                {
+                    PartialBlock(src[srcPos..], dstWidth, dstHeight, dst[dstOffset..], x, y, rowStride);
+                }
             }
         }
     }
 
     void PartialBlock(
         ReadOnlySpan<byte> src, int width, int height,
-        Span<byte> dst, int x, int y, int rowStride
-    )
+        Span<byte> dst, int x, int y, int rowStride)
     {
         var blockStride = bytesPerPixel * BlockWidth;
         var block = (stackalloc byte[BlockHeight * blockStride]);
@@ -82,5 +95,48 @@ public abstract class BlockDecoder(int bytesPerBlock, int bytesPerPixel)
                 .Slice(yy * blockStride, partialStride)
                 .CopyTo(dst[(yy * rowStride)..]);
         }
+    }
+
+    public static int SourceSize(int width, int height, BlockFormat format)
+    {
+        var bytesPerBlock = format switch
+        {
+            BlockFormat.BC1
+                or BlockFormat.BC1NoAlpha
+                or BlockFormat.BC4U
+                or BlockFormat.BC4S => 8,
+            _ => 16
+        };
+
+        return SourceSize(width, height, bytesPerBlock);
+    }
+
+    static int SourceSize(int width, int height, int bytesPerBlock)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
+
+        var widthInBlocks = (width + 3) / 4;
+        var heightInBlocks = (height + 3) / 4;
+        return widthInBlocks * heightInBlocks * bytesPerBlock;
+    }
+
+    public static int TargetSize(int width, int height, BlockFormat format)
+    {
+        var bytesPerPixel = format switch
+        {
+            BlockFormat.BC6HUf16 or BlockFormat.BC6HSf16 => 8,
+            BlockFormat.BC6HUf32 or BlockFormat.BC6HSf32 => 16,
+            _ => 4
+        };
+        return TargetSize(width, height, bytesPerPixel);
+    }
+
+    static int TargetSize(int width, int height, int bytesPerPixel)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
+
+        return width * height * bytesPerPixel;
     }
 }
